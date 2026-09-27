@@ -6,245 +6,56 @@
   <title>Vasper</title>
   <style>
     :root {
-      --bg: #0a0a0b;
-      --panel: #111114;
-      --card: #16161a;
-      --line: #2a2a30;
-      --text: #f2f2f3;
-      --muted: #8b8b96;
-      --red: #e11d2e;
-      --red2: #ff2d3f;
-      --red-dim: rgba(225, 29, 46, 0.14);
-      --ok: #3dd68c;
-      --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
-      --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --bg:#0a0a0b; --panel:#111114; --card:#16161a; --line:#2a2a30;
+      --text:#f2f2f3; --muted:#8b8b96; --red:#e11d2e; --red2:#ff2d3f;
+      --red-dim:rgba(225,29,46,.14); --ok:#3dd68c;
+      --mono:ui-monospace,Menlo,monospace; --sans:"Segoe UI",system-ui,sans-serif;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(600px 280px at 10% -5%, rgba(225,29,46,.18), transparent 60%),
-        radial-gradient(500px 240px at 100% 0%, rgba(225,29,46,.08), transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .wrap, .nav, .gate { position: relative; z-index: 1; }
-    .banner {
-      background: var(--red-dim);
-      border-bottom: 1px solid #3a1218;
-      color: #ff6b78;
-      text-align: center;
-      padding: 9px 12px;
-      font-size: .78rem;
-      font-weight: 600;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-    .nav {
-      border-bottom: 1px solid var(--line);
-      background: rgba(10,10,11,.9);
-      backdrop-filter: blur(12px);
-      position: sticky; top: 0; z-index: 40;
-    }
-    .nav-in {
-      max-width: 980px; margin: 0 auto;
-      padding: 14px 16px;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    }
-    .logo {
-      font-weight: 800;
-      letter-spacing: .2em;
-      font-size: .82rem;
-      color: var(--text);
-    }
-    .logo span { color: var(--red2); }
-    .tabs { display: flex; gap: 6px; }
-    .tabs button {
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--muted);
-      font-family: inherit;
-      font-size: .8rem;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .tabs button:hover { color: var(--text); border-color: var(--line); }
-    .tabs button.active {
-      color: #fff;
-      background: var(--red);
-      border-color: var(--red);
-    }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 70px; }
-    .view { display: none; }
-    .view.active { display: block; }
-    h1 {
-      margin: 0;
-      font-size: clamp(1.5rem, 3vw, 1.9rem);
-      font-weight: 700;
-      letter-spacing: -.02em;
-    }
-    .sub { margin: 8px 0 18px; color: var(--muted); font-size: .9rem; }
-    .btn {
-      border: 0;
-      border-radius: 6px;
-      padding: 10px 16px;
-      font-family: inherit;
-      font-weight: 700;
-      font-size: .82rem;
-      letter-spacing: .03em;
-      cursor: pointer;
-    }
-    .btn-r { background: var(--red); color: #fff; }
-    .btn-r:hover { background: var(--red2); }
-    .btn-g {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--line);
-    }
-    .btn-g:hover { border-color: #444; }
-    .btn-d {
-      background: transparent;
-      color: var(--red2);
-      border: 1px solid #5a1820;
-    }
-    .btn-sm { padding: 7px 11px; font-size: .75rem; }
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 18px;
-    }
-    label {
-      display: block;
-      font-size: .7rem;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 11px 12px;
-      border-radius: 6px;
-      border: 1px solid var(--line);
-      background: var(--card);
-      color: var(--text);
-      font-family: inherit;
-      font-size: .9rem;
-      margin-bottom: 12px;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--red);
-      box-shadow: 0 0 0 2px var(--red-dim);
-    }
-    textarea {
-      font-family: var(--mono);
-      font-size: 12px;
-      min-height: 230px;
-      line-height: 1.5;
-      resize: vertical;
-    }
-    .row { display: flex; flex-wrap: wrap; gap: 8px; }
-    .msg { margin-top: 10px; font-size: .84rem; color: var(--muted); min-height: 18px; }
-    .msg.ok { color: var(--ok); }
-    .msg.err { color: var(--red2); }
-    .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    @media (min-width: 720px) { .grid { grid-template-columns: 1fr 1fr; } }
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .card:hover { border-color: #3a3a44; }
-    .card h3 { margin: 0; font-size: .98rem; }
-    .pill {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: .65rem;
-      font-weight: 800;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      background: var(--red-dim);
-      color: var(--red2);
-      border: 1px solid #5a1820;
-    }
-    .meta { font-size: .75rem; color: var(--muted); }
-    .box {
-      margin-top: 12px;
-      background: #050506;
-      border: 1px solid var(--line);
-      border-left: 3px solid var(--red);
-      border-radius: 6px;
-      padding: 12px;
-      font-family: var(--mono);
-      font-size: 11.5px;
-      color: #e8c4c8;
-      white-space: pre-wrap;
-      word-break: break-all;
-      display: none;
-    }
-    .box.show { display: block; }
-    .check {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: .88rem;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .check input { width: 15px; height: 15px; accent-color: var(--red); margin: 0; }
-    .gate {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .gate-card {
-      max-width: 400px;
-      width: 100%;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-top: 3px solid var(--red);
-      border-radius: 10px;
-      padding: 32px 24px;
-      text-align: center;
-    }
-    .gate-card h1 { font-size: 1.4rem; margin: 0 0 10px; }
-    .gate-card p { color: var(--muted); margin: 0 0 18px; line-height: 1.5; font-size: .9rem; }
-    footer {
-      margin-top: 36px;
-      padding-top: 14px;
-      border-top: 1px solid var(--line);
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      color: var(--muted);
-      font-size: .75rem;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
+    body::before{content:"";position:fixed;inset:0;background:radial-gradient(600px 280px at 10% -5%,rgba(225,29,46,.18),transparent 60%);pointer-events:none;z-index:0}
+    .wrap,.nav,.gate{position:relative;z-index:1}
+    .banner{background:var(--red-dim);border-bottom:1px solid #3a1218;color:#ff6b78;text-align:center;padding:9px 12px;font-size:.78rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+    .nav{border-bottom:1px solid var(--line);background:rgba(10,10,11,.9);backdrop-filter:blur(12px);position:sticky;top:0;z-index:40}
+    .nav-in{max-width:980px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .logo{font-weight:800;letter-spacing:.2em;font-size:.82rem}.logo span{color:var(--red2)}
+    .tabs{display:flex;gap:6px}
+    .tabs button{border:1px solid transparent;background:transparent;color:var(--muted);font-family:inherit;font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:8px 14px;border-radius:6px;cursor:pointer}
+    .tabs button.active{color:#fff;background:var(--red);border-color:var(--red)}
+    .wrap{max-width:980px;margin:0 auto;padding:28px 16px 70px}
+    .view{display:none}.view.active{display:block}
+    h1{margin:0;font-size:clamp(1.5rem,3vw,1.9rem);font-weight:700}
+    .sub{margin:8px 0 18px;color:var(--muted);font-size:.9rem}
+    .btn{border:0;border-radius:6px;padding:10px 16px;font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer}
+    .btn-r{background:var(--red);color:#fff}.btn-g{background:transparent;color:var(--text);border:1px solid var(--line)}
+    .btn-d{background:transparent;color:var(--red2);border:1px solid #5a1820}
+    .btn-sm{padding:7px 11px;font-size:.75rem}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+    label{display:block;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    input,select,textarea{width:100%;padding:11px 12px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--text);font-family:inherit;font-size:.9rem;margin-bottom:12px}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red)}
+    textarea{font-family:var(--mono);font-size:12px;min-height:220px;line-height:1.5;resize:vertical}
+    .row{display:flex;flex-wrap:wrap;gap:8px}
+    .keyrow{display:flex;gap:8px;align-items:stretch;margin-bottom:12px}
+    .keyrow input{margin-bottom:0;flex:1}
+    .msg{margin-top:10px;font-size:.84rem;color:var(--muted);min-height:18px}
+    .msg.ok{color:var(--ok)}.msg.err{color:var(--red2)}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+    .card h3{margin:0;font-size:.98rem}
+    .pill{display:inline-block;padding:3px 8px;border-radius:4px;font-size:.65rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--red-dim);color:var(--red2);border:1px solid #5a1820}
+    .meta{font-size:.75rem;color:var(--muted)}
+    .box{margin-top:12px;background:#050506;border:1px solid var(--line);border-left:3px solid var(--red);border-radius:6px;padding:12px;font-family:var(--mono);font-size:11.5px;color:#e8c4c8;white-space:pre-wrap;word-break:break-all;display:none}
+    .box.show{display:block}
+    .check{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted);margin-bottom:12px}
+    .check input{width:15px;height:15px;accent-color:var(--red);margin:0}
+    .gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .gate-card{max-width:400px;width:100%;background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--red);border-radius:10px;padding:32px 24px;text-align:center}
+    .gate-card h1{font-size:1.4rem;margin:0 0 10px}
+    .gate-card p{color:var(--muted);margin:0 0 18px;line-height:1.5;font-size:.9rem}
+    .hint{background:var(--red-dim);border:1px solid #5a1820;border-radius:8px;padding:12px;font-size:.82rem;color:#ff8a94;margin-bottom:14px;line-height:1.5}
+    footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:.75rem;letter-spacing:.04em;text-transform:uppercase}
   </style>
 </head>
 <body>
@@ -252,14 +63,14 @@
     <div class="gate-card">
       <div class="logo" style="margin-bottom:16px">VASPER <span>LUA</span></div>
       <h1>Access denied</h1>
-      <p>Source is locked. Run the official loader with a valid <code style="color:var(--red2)">script_key</code>.</p>
+      <p>This link is locked. Users need a loader + script_key from you.</p>
       <button type="button" class="btn btn-r" id="gateHome">Main site</button>
       <p class="meta" style="margin-top:16px" id="gateMeta"></p>
     </div>
   </div>
 
   <div id="app">
-    <div class="banner">Protected loaders · script_key auth · source hidden on share</div>
+    <div class="banner">Generate keys · protect loader · keep users on your key only</div>
     <nav class="nav">
       <div class="nav-in">
         <div class="logo">VASPER <span>LUA</span></div>
@@ -269,11 +80,10 @@
         </div>
       </div>
     </nav>
-
     <div class="wrap">
       <section class="view active" id="view-library">
         <h1>Library</h1>
-        <p class="sub">Your scripts · free · loader uses script_key</p>
+        <p class="sub">Each script can have its own generated key</p>
         <div class="row" style="margin-bottom:14px">
           <button type="button" class="btn btn-r" id="btnNew">New script</button>
         </div>
@@ -282,7 +92,12 @@
 
       <section class="view" id="view-create">
         <h1>Editor</h1>
-        <p class="sub">Build a normal script_key loader</p>
+        <p class="sub">Generate a key · loader won’t run without it</p>
+        <div class="hint">
+          <strong style="color:#fff">For your users:</strong> give them the key + loader file only.<br>
+          Share links open the website (no source).<br>
+          Wrong key → loader stops.
+        </div>
         <div class="panel">
           <label>Name</label>
           <input type="text" id="name" placeholder="Script name" maxlength="64" />
@@ -292,27 +107,26 @@
             <option value="error">Error</option>
             <option value="offline">Offline</option>
           </select>
-          <label class="check"><input type="checkbox" id="protect" checked /> Protect (script_key)</label>
+          <label class="check"><input type="checkbox" id="protect" checked /> Protect loader (require script_key)</label>
           <label>script_key</label>
-          <input type="text" id="key" placeholder="VS-XXXX-XXXX" maxlength="64" />
+          <div class="keyrow">
+            <input type="text" id="key" placeholder="Click Generate" maxlength="64" />
+            <button type="button" class="btn btn-r" id="genKey">Generate</button>
+          </div>
           <label>Source</label>
-          <textarea id="code" placeholder="-- lua" spellcheck="false"></textarea>
+          <textarea id="code" placeholder="-- your lua" spellcheck="false"></textarea>
           <div class="row">
             <button type="button" class="btn btn-r" id="save">Save</button>
             <button type="button" class="btn btn-g" id="copyLoader">Copy loader</button>
-            <button type="button" class="btn btn-g" id="dl">Download</button>
+            <button type="button" class="btn btn-g" id="dl">Download loader</button>
             <button type="button" class="btn btn-g" id="share">Share link</button>
             <button type="button" class="btn btn-g" id="back">Library</button>
           </div>
-          <div class="msg" id="msg">Ready</div>
+          <div class="msg" id="msg">Generate a key to protect the loader</div>
           <div class="box" id="out"></div>
         </div>
       </section>
-
-      <footer>
-        <span>Vasper</span>
-        <span>Black / Red</span>
-      </footer>
+      <footer><span>Vasper</span><span>Key protected loader</span></footer>
     </div>
   </div>
 
@@ -328,12 +142,8 @@
     var list = [];
     try { list = JSON.parse(localStorage.getItem(STORE) || "[]"); } catch (e) {}
     var found = list.find(function (x) { return x.id === shareId; });
-    document.getElementById("gateMeta").textContent = found
-      ? ((found.name || "Script") + " · locked")
-      : "locked";
-    document.getElementById("gateHome").onclick = function () {
-      location.href = location.pathname;
-    };
+    document.getElementById("gateMeta").textContent = found ? ((found.name || "Script") + " · locked") : "locked";
+    document.getElementById("gateHome").onclick = function () { location.href = location.pathname; };
     return;
   }
 
@@ -372,24 +182,45 @@
     return location.origin + location.pathname + "?s=" + encodeURIComponent(id);
   }
 
+  // Generate a strong-looking key for users
+  function generateKey() {
+    var seg = function () {
+      var s = "";
+      var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      for (var i = 0; i < 4; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+      return s;
+    };
+    return "VS-" + seg() + "-" + seg() + "-" + seg() + "-" + seg();
+  }
+
+  document.getElementById("genKey").onclick = function () {
+    keyEl.value = generateKey();
+    protectEl.checked = true;
+    setMsg("Key generated — save & download loader for your users.", true);
+  };
+
+  // Protected loader: must have correct script_key
   function buildLoader(code, key) {
-    var k = String(key || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-    var body = String(code).replace(/\]\]/g, "]]..']]'..[[");
     if (!key) return code;
+    var k = String(key).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    var body = String(code).replace(/\]\]/g, "]]..']]'..[[");
     return [
-      "-- Vasper loader",
+      "-- Vasper protected loader",
+      "-- Give users: this file + their script_key",
+      "-- Wrong key = will not run",
+      "",
       "script_key = script_key or (getgenv and getgenv().script_key) or \"\"",
       "",
-      "if script_key ~= \"" + k + "\" then",
-      "    warn(\"[Vasper] Invalid key\")",
-      "    return",
+      "if type(script_key) ~= \"string\" or script_key == \"\" or script_key ~= \"" + k + "\" then",
+      "  warn(\"[Vasper] Access denied — invalid or missing script_key\")",
+      "  return",
       "end",
       "",
-      "local _src = [[" + body + "]]",
-      "local fn, err = loadstring(_src)",
+      "local src = [[" + body + "]]",
+      "local fn, err = loadstring(src)",
       "if not fn then",
-      "    warn(\"[Vasper]\", err)",
-      "    return",
+      "  warn(\"[Vasper] Load error:\", err)",
+      "  return",
       "end",
       "return fn()"
     ].join("\n");
@@ -410,8 +241,7 @@
     var arr = load();
     if (editingId) {
       var i = arr.findIndex(function (x) { return x.id === editingId; });
-      if (i >= 0) arr[i] = d;
-      else { editingId = d.id; arr.push(d); }
+      if (i >= 0) arr[i] = d; else { editingId = d.id; arr.push(d); }
     } else {
       editingId = d.id;
       arr.push(d);
@@ -443,7 +273,7 @@
       card.querySelector("h3").textContent = s.name || "Untitled";
       card.querySelector(".meta").textContent =
         (s.status === "error" ? "Error · " : s.status === "offline" ? "Offline · " : "Live · ") +
-        (s.protect ? "keyed · " : "") +
+        (s.protect && s.key ? ("key " + s.key.slice(0, 10) + "… · ") : "") +
         new Date(s.updated).toLocaleString();
       card.querySelectorAll("button").forEach(function (btn) {
         btn.onclick = function () {
@@ -458,26 +288,9 @@
             out.classList.remove("show");
             show("create");
           } else if (a === "loader") {
-            editingId = s.id;
-            nameEl.value = s.name || "";
-            codeEl.value = s.code || "";
-            statusEl.value = s.status || "alive";
-            protectEl.checked = s.protect !== false;
-            keyEl.value = s.key || "";
-            show("create");
-            var loader = buildLoader(s.code, s.key);
-            out.textContent =
-              "script_key = \"" + (s.key || "KEY") + "\"\n\n" + loader;
-            out.classList.add("show");
-            setMsg("Loader ready", true);
+            showLoader(s);
           } else if (a === "dl") {
-            if (!s.code.trim()) return;
-            if (s.protect && !s.key) return alert("Set script_key");
-            var body = s.protect ? buildLoader(s.code, s.key) : s.code;
-            var ael = document.createElement("a");
-            ael.href = URL.createObjectURL(new Blob([body], { type: "text/plain" }));
-            ael.download = (s.name || "script").replace(/[^\w\-]+/g, "_") + "_loader.lua";
-            ael.click();
+            download(s);
           } else if (a === "del") {
             saveAll(load().filter(function (x) { return x.id !== s.id; }));
             render();
@@ -488,39 +301,73 @@
     });
   }
 
+  function showLoader(s) {
+    editingId = s.id;
+    nameEl.value = s.name || "";
+    codeEl.value = s.code || "";
+    statusEl.value = s.status || "alive";
+    protectEl.checked = s.protect !== false;
+    keyEl.value = s.key || "";
+    show("create");
+    if (!s.key) {
+      setMsg("Generate a key first.", false);
+      return;
+    }
+    var text =
+      "-- Give this to your user:\n" +
+      "script_key = \"" + s.key + "\"\n\n" +
+      "-- Then run the downloaded loader file\n\n" +
+      buildLoader(s.code, s.key);
+    out.textContent = text;
+    out.classList.add("show");
+    setMsg("Protected loader ready", true);
+  }
+
+  function download(s) {
+    if (!s.code || !s.code.trim()) return alert("No code");
+    if (s.protect && !s.key) return alert("Generate a script_key first");
+    var body = s.protect ? buildLoader(s.code, s.key) : s.code;
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([body], { type: "text/plain" }));
+    a.download = (s.name || "script").replace(/[^\w\-]+/g, "_") + "_loader.lua";
+    a.click();
+  }
+
   document.getElementById("btnNew").onclick = function () {
     editingId = null;
     nameEl.value = "";
     codeEl.value = "";
     statusEl.value = "alive";
     protectEl.checked = true;
-    keyEl.value = "";
+    keyEl.value = generateKey();
     out.classList.remove("show");
     show("create");
-    setMsg("New");
+    setMsg("New script — key already generated.", true);
   };
   document.getElementById("back").onclick = function () { render(); show("library"); };
 
   document.getElementById("save").onclick = function () {
     var d = current();
     if (!d.code.trim()) return setMsg("Need code.", false);
-    if (d.protect && !d.key) return setMsg("Need script_key.", false);
+    if (d.protect && !d.key) return setMsg("Generate a key first.", false);
     persist(d);
-    setMsg("Saved.", true);
+    setMsg("Saved · loader protected with your key.", true);
     render();
   };
 
   document.getElementById("copyLoader").onclick = async function () {
     var d = current();
     if (!d.code.trim()) return setMsg("Need code.", false);
-    if (d.protect && !d.key) return setMsg("Need script_key.", false);
+    if (d.protect && !d.key) return setMsg("Generate a key first.", false);
     persist(d);
-    var text = "script_key = \"" + d.key.replace(/"/g, '\\"') + "\"\n\n" + buildLoader(d.code, d.key);
+    var text =
+      "script_key = \"" + d.key.replace(/"/g, '\\"') + "\"\n\n" +
+      buildLoader(d.code, d.key);
     out.textContent = text;
     out.classList.add("show");
     try {
       await navigator.clipboard.writeText(text);
-      setMsg("Copied.", true);
+      setMsg("Protected loader copied.", true);
     } catch (e) {
       setMsg("Copy from box.", true);
     }
@@ -529,14 +376,10 @@
   document.getElementById("dl").onclick = function () {
     var d = current();
     if (!d.code.trim()) return setMsg("Need code.", false);
-    if (d.protect && !d.key) return setMsg("Need script_key.", false);
+    if (d.protect && !d.key) return setMsg("Generate a key first.", false);
     persist(d);
-    var body = d.protect ? buildLoader(d.code, d.key) : d.code;
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([body], { type: "text/plain" }));
-    a.download = (d.name || "script").replace(/[^\w\-]+/g, "_") + "_loader.lua";
-    a.click();
-    setMsg("Downloaded.", true);
+    download(d);
+    setMsg("Loader downloaded — give users the key + file.", true);
   };
 
   document.getElementById("share").onclick = function () {
@@ -544,13 +387,11 @@
     if (!d.code.trim()) return setMsg("Save first.", false);
     persist(d);
     var url = shareUrl(editingId);
-    out.textContent = url;
+    out.textContent = url + "\n\n(website only — no source, no key)";
     out.classList.add("show");
     navigator.clipboard.writeText(url).then(function () {
-      setMsg("Share link copied (no source).", true);
-    }).catch(function () {
-      setMsg("Link ready.", true);
-    });
+      setMsg("Share link copied (safe page only).", true);
+    }).catch(function () { setMsg("Link ready.", true); });
   };
 
   render();

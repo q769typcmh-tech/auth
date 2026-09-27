@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vasper Shield — Script licensing platform</title>
+  <meta name="description" content="Vasper Shield — protect, license, and deliver your Lua scripts. Independent platform." />
+  <style>
+    :root {
+      --bg: #fffdf5;
+      --surface: #ffffff;
+      --text: #1a1508;
+      --muted: #7a6f52;
+      --line: #f0e4b8;
+      --yellow: #f5c518;
+      --yellow2: #e6b000;
+      --yellow-soft: #fff6cc;
+      --ink: #1a1508;
+      --ok: #1a7f4b;
+      --ok-bg: #e8f8ef;
+      --err: #c0392b;
+      --err-bg: #fdecea;
+      --blue: #2563eb;
+      --blue-bg: #eff6ff;
+      --mono: ui-monospace, "SF Mono", Menlo, monospace;
+      --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    .banner {
+      background: var(--yellow-soft);
+      border-bottom: 1px solid var(--line);
+      color: #8a6a00;
+      text-align: center;
+      padding: 9px 14px;
+      font-size: .82rem;
+      font-weight: 600;
+    }
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      max-width: 1140px; margin: 0 auto;
+      padding: 12px 18px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .logo { font-weight: 800; letter-spacing: .04em; font-size: .95rem; }
+    .logo span { color: var(--yellow2); }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+    .nav-links button, .nav-links a {
+      background: transparent; border: 0; color: var(--muted);
+      font-family: inherit; font-size: .86rem; font-weight: 600;
+      padding: 8px 12px; border-radius: 999px; cursor: pointer;
+    }
+    .nav-links button:hover, .nav-links a:hover { color: var(--text); background: var(--yellow-soft); }
+    .nav-links button.active { background: var(--yellow); color: var(--ink); }
+    .btn {
+      border: 0; border-radius: 999px; padding: 11px 18px;
+      font-family: inherit; font-weight: 700; font-size: .88rem; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn-y {
+      background: linear-gradient(135deg, var(--yellow2), var(--yellow));
+      color: var(--ink); box-shadow: 0 4px 14px rgba(230,176,0,.28);
+    }
+    .btn-dark { background: var(--ink); color: #fff; }
+    .btn-ghost { background: #fff; color: var(--text); border: 1px solid var(--line); }
+    .btn-danger { background: var(--err-bg); color: var(--err); border: 1px solid #f5c4bf; }
+    .btn-sm { padding: 7px 12px; font-size: .8rem; }
+    .btn:hover { filter: brightness(1.04); }
+    .wrap { max-width: 1140px; margin: 0 auto; padding: 28px 18px 80px; }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* LANDING */
+    .hero {
+      display: grid; gap: 28px; padding: 36px 0 20px;
+    }
+    @media (min-width: 900px) {
+      .hero { grid-template-columns: 1.2fr .8fr; align-items: center; }
+    }
+    .hero h1 {
+      margin: 0; font-family: var(--serif); font-weight: 500;
+      font-size: clamp(2rem, 4.5vw, 3rem); letter-spacing: -.03em; line-height: 1.1;
+    }
+    .hero p { margin: 14px 0 0; color: var(--muted); line-height: 1.65; max-width: 36em; }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .card-box {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 18px; padding: 20px; box-shadow: 0 12px 40px rgba(230,176,0,.08);
+    }
+    .card-box .row-item {
+      display: flex; justify-content: space-between; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .9rem;
+    }
+    .card-box .row-item:last-child { border-bottom: 0; }
+    .card-box .k { color: var(--muted); }
+    .card-box .v { font-weight: 700; }
+    .section { margin-top: 48px; }
+    .section h2 {
+      margin: 0 0 8px; font-family: var(--serif); font-weight: 500; font-size: 1.6rem;
+    }
+    .section .sub { margin: 0 0 18px; color: var(--muted); }
+    .grid3 {
+      display: grid; grid-template-columns: 1fr; gap: 12px;
+    }
+    @media (min-width: 720px) { .grid3 { grid-template-columns: 1fr 1fr 1fr; } }
+    .feat {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 14px; padding: 16px;
+    }
+    .feat h3 { margin: 0 0 6px; font-size: .95rem; }
+    .feat p { margin: 0; font-size: .84rem; color: var(--muted); line-height: 1.45; }
+
+    /* DASHBOARD LAYOUT */
+    .dash-head {
+      display: flex; flex-wrap: wrap; justify-content: space-between;
+      align-items: flex-end; gap: 12px; margin-bottom: 18px;
+    }
+    .dash-head h1 {
+      margin: 0; font-family: var(--serif); font-weight: 500; font-size: 1.75rem;
+    }
+    .dash-head p { margin: 4px 0 0; color: var(--muted); font-size: .9rem; }
+    .stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px;
+    }
+    @media (max-width: 800px) { .stats { grid-template-columns: 1fr 1fr; } }
+    .stat {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 14px; padding: 14px; text-align: center;
+    }
+    .stat b { display: block; font-size: 1.4rem; color: var(--yellow2); }
+    .stat span { font-size: .72rem; color: var(--muted); font-weight: 600; }
+    .panel {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 16px; padding: 18px; margin-bottom: 14px;
+    }
+    .panel h3 { margin: 0 0 12px; font-size: 1rem; }
+    label { display: block; font-size: .76rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+    input, select, textarea {
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--line); background: #fffef8; color: var(--text);
+      font-family: inherit; font-size: .9rem; margin-bottom: 12px;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--yellow2);
+      box-shadow: 0 0 0 3px rgba(245,197,24,.22);
+    }
+    textarea { font-family: var(--mono); font-size: 12.5px; min-height: 180px; resize: vertical; line-height: 1.45; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .msg { font-size: .86rem; color: var(--muted); min-height: 18px; margin-top: 8px; }
+    .msg.ok { color: var(--ok); }
+    .msg.err { color: var(--err); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
+    .pill {
+      display: inline-block; padding: 3px 8px; border-radius: 999px;
+      font-size: .68rem; font-weight: 800; text-transform: uppercase;
+    }
+    .pill.ok { background: var(--ok-bg); color: var(--ok); }
+    .pill.err { background: var(--err-bg); color: var(--err); }
+    .pill.free { background: var(--yellow-soft); color: #8a6a00; }
+    .pill.blue { background: var(--blue-bg); color: var(--blue); }
+    .mono { font-family: var(--mono); font-size: .8rem; word-break: break-all; }
+    .split {
+      display: grid; grid-template-columns: 1fr; gap: 14px;
+    }
+    @media (min-width: 900px) { .split { grid-template-columns: 1fr 1fr; } }
+    .empty { text-align: center; padding: 28px; color: var(--muted); }
+    .loader-box {
+      background: #1a1508; color: #f5e6a8; border-radius: 12px;
+      padding: 14px; font-family: var(--mono); font-size: 12px;
+      line-height: 1.5; white-space: pre-wrap; word-break: break-all;
+    }
+    footer {
+      margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+      color: var(--muted); font-size: .8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">Vasper Shield · independent licensing platform · demo runs in your browser (no real server yet)</div>
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="logo">VASPER <span>SHIELD</span></div>
+      <div class="nav-links">
+        <button type="button" class="active" data-v="home">Product</button>
+        <button type="button" data-v="dashboard">Dashboard</button>
+        <button type="button" data-v="projects">Projects</button>
+        <button type="button" data-v="licenses">Licenses</button>
+        <button type="button" data-v="loader">Loader</button>
+        <button type="button" data-v="docs">Docs</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <!-- HOME -->
+    <section class="view active" id="view-home">
+      <div class="hero">
+        <div>
+          <h1>License your Lua.<br />Deliver with control.</h1>
+          <p>
+            Vasper Shield is an independent platform to manage projects, upload scripts,
+            generate keys, bind devices, and ship a thin loader that checks your server first.
+            Not affiliated with any other licensing brand.
+          </p>
+          <div class="hero-cta">
+            <button type="button" class="btn btn-y" data-go="dashboard">Open dashboard</button>
+            <button type="button" class="btn btn-ghost" data-go="docs">How it works</button>
+          </div>
+        </div>
+        <div class="card-box">
+          <div class="row-item"><span class="k">Product</span><span class="v">Vasper Shield</span></div>
+          <div class="row-item"><span class="k">Version</span><span class="v">1.0.0 demo</span></div>
+          <div class="row-item"><span class="k">Projects</span><span class="v" id="homeProjects">0</span></div>
+          <div class="row-item"><span class="k">Licenses</span><span class="v" id="homeLicenses">0</span></div>
+          <div class="row-item"><span class="k">Backend</span><span class="v">Browser demo</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>What you get</h2>
+        <p class="sub">Core pieces of a licensing platform — built as a learning dashboard.</p>
+        <div class="grid3">
+          <div class="feat"><h3>Projects</h3><p>Container for one product. Public ID used by the loader.</p></div>
+          <div class="feat"><h3>Scripts</h3><p>Upload Lua, version it, update without changing the loader URL.</p></div>
+          <div class="feat"><h3>Licenses</h3><p>Generate keys, set expiry, revoke access.</p></div>
+          <div class="feat"><h3>Loader</h3><p>Thin public file: check key → then run authorized script.</p></div>
+          <div class="feat"><h3>Device bind</h3><p>Optional HWID lock (demo stores a simple fingerprint).</p></div>
+          <div class="feat"><h3>Dashboard</h3><p>Manage everything in one white + yellow workspace.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="view" id="view-dashboard">
+      <div class="dash-head">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Overview of your demo workspace.</p>
+        </div>
+        <button type="button" class="btn btn-y" data-go="projects">New project</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="stProjects">0</b><span>Projects</span></div>
+        <div class="stat"><b id="stScripts">0</b><span>Scripts</span></div>
+        <div class="stat"><b id="stKeys">0</b><span>Licenses</span></div>
+        <div class="stat"><b id="stActive">0</b><span>Active keys</span></div>
+      </div>
+      <div class="panel">
+        <h3>Quick start</h3>
+        <ol style="margin:0;padding-left:18px;color:var(--muted);line-height:1.7;font-size:.9rem">
+          <li>Create a <strong style="color:var(--text)">project</strong></li>
+          <li>Add a <strong style="color:var(--text)">script</strong> (Lua source)</li>
+          <li>Generate a <strong style="color:var(--text)">license key</strong></li>
+          <li>Copy the <strong style="color:var(--text)">loader</strong> template</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="view" id="view-projects">
+      <div class="dash-head">
+        <div>
+          <h1>Projects & scripts</h1>
+          <p>Create a project, then attach Lua source.</p>
+        </div>
+      </div>
+      <div class="split">
+        <div class="panel">
+          <h3>Create project</h3>
+          <label>Project name</label>
+          <input type="text" id="projName" placeholder="My Product" maxlength="64" />
+          <div class="row">
+            <button type="button" class="btn btn-y" id="createProj">Create project</button>
+          </div>
+          <div class="msg" id="projMsg"></div>
+        </div>
+        <div class="panel">
+          <h3>Add / update script</h3>
+          <label>Project</label>
+          <select id="scriptProject"></select>
+          <label>Script name</label>
+          <input type="text" id="scriptName" placeholder="main" maxlength="64" />
+          <label>Lua source</label>
+          <textarea id="scriptBody" placeholder="print('hello from Vasper Shield')"></textarea>
+          <div class="row">
+            <button type="button" class="btn btn-y" id="saveScript">Save script</button>
+          </div>
+          <div class="msg" id="scriptMsg"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Your projects</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Public ID</th><th>Script</th><th>Updated</th><th></th></tr>
+            </thead>
+            <tbody id="projTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- LICENSES -->
+    <section class="view" id="view-licenses">
+      <div class="dash-head">
+        <div>
+          <h1>Licenses</h1>
+          <p>Generate keys, set days, revoke.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Generate key</h3>
+        <div class="split">
+          <div>
+            <label>Project</label>
+            <select id="licProject"></select>
+          </div>
+          <div>
+            <label>Expires in (days, 0 = lifetime)</label>
+            <input type="text" id="licDays" value="30" />
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" class="btn btn-y" id="genKey">Generate license</button>
+        </div>
+        <div class="msg" id="licMsg"></div>
+      </div>
+      <div class="panel">
+        <h3>All keys</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Key</th><th>Project</th><th>Expires</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="licTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOADER -->
+    <section class="view" id="view-loader">
+      <div class="dash-head">
+        <div>
+          <h1>Loader</h1>
+          <p>Thin client: authorize with your API, then run script. Demo validates in-browser.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <label>Project</label>
+        <select id="loaderProject"></select>
+        <label>License key (for test)</label>
+        <input type="text" id="loaderKey" placeholder="Paste a generated key" />
+        <div class="row">
+          <button type="button" class="btn btn-y" id="copyLoader">Copy loader template</button>
+          <button type="button" class="btn btn-ghost" id="testDeliver">Test deliver (demo)</button>
+        </div>
+        <div class="msg" id="loaderMsg"></div>
+        <div class="loader-box" id="loaderOut" style="margin-top:12px">Select a project to generate a loader template.</div>
+      </div>
+    </section>
+
+    <!-- DOCS -->
+    <section class="view" id="view-docs">
+      <div class="dash-head">
+        <div>
+          <h1>How it works</h1>
+          <p>Independent design — not affiliated with other brands.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Architecture</h3>
+        <p style="color:var(--muted);font-size:.9rem;line-height:1.65;margin:0">
+          <strong style="color:var(--text)">Dashboard</strong> manages projects, scripts, and keys (this website).<br />
+          <strong style="color:var(--text)">API</strong> (future Node server) validates licenses and returns script bodies.<br />
+          <strong style="color:var(--text)">Loader</strong> is a small public Lua file users run; it calls your API first.<br />
+          This demo stores data in <strong style="color:var(--text)">localStorage</strong> so you can try the workflow without a server.
+        </p>
+      </div>
+      <div class="grid3" style="margin-top:14px">
+        <div class="feat"><h3>1. Project</h3><p>Gets a public ID the loader embeds.</p></div>
+        <div class="feat"><h3>2. Script</h3><p>Lua source saved as the current version.</p></div>
+        <div class="feat"><h3>3. License</h3><p>Random key + optional expiry + revoke.</p></div>
+        <div class="feat"><h3>4. Loader</h3><p>Sends project id + key → receives script if allowed.</p></div>
+        <div class="feat"><h3>5. Update</h3><p>Change script in dashboard; loader URL stays the same.</p></div>
+        <div class="feat"><h3>6. Revoke</h3><p>Key stops working on next deliver check.</p></div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h3>Next step (real backend)</h3>
+        <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin:0">
+          When you are ready: Node.js API + SQLite/Postgres on Railway/Render,
+          same routes as this demo (<code class="mono">/v1/deliver</code>), HTTPS, rate limits.
+          Ask for the API starter pack and we generate the server files next.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <span>© Vasper Shield</span>
+      <span>Independent · demo v1.0.0</span>
+    </footer>
+  </div>
+
+  <script>
+(function () {
+  const DB_KEY = "vasper_shield_db_v1";
+
+  function loadDB() {
+    try {
+      const d = JSON.parse(localStorage.getItem(DB_KEY) || "{}");
+      return {
+        projects: d.projects || [],
+        licenses: d.licenses || []
+      };
+    } catch (e) {
+      return { projects: [], licenses: [] };
+    }
+  }
+  function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+  function uid(prefix) {
+    return (prefix || "id") + "_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+  }
+  function genKey() {
+    const seg = function () {
+      return Math.random().toString(36).slice(2, 6).toUpperCase();
+    };
+    return "VS-" + seg() + "-" + seg() + "-" + seg() + "-" + seg();
+  }
+  function setMsg(id, text, ok) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text || "";
+    el.className = "msg" + (ok === true ? " ok" : ok === false ? " err" : "");
+  }
+
+  function show(v) {
+    document.querySelectorAll(".view").forEach(function (el) { el.classList.remove("active"); });
+    document.querySelectorAll(".nav-links button").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-v") === v);
+    });
+    document.getElementById("view-" + v).classList.add("active");
+    refreshAll();
+  }
+
+  document.querySelectorAll(".nav-links button").forEach(function (b) {
+    b.onclick = function () { show(b.getAttribute("data-v")); };
+  });
+  document.querySelectorAll("[data-go]").forEach(function (b) {
+    b.onclick = function () { show(b.getAttribute("data-go")); };
+  });
+
+  function fillProjectSelects() {
+    const db = loadDB();
+    const ids = ["scriptProject", "licProject", "loaderProject"];
+    ids.forEach(function (id) {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      const cur = sel.value;
+      sel.innerHTML = "";
+      if (!db.projects.length) {
+        const o = document.createElement("option");
+        o.value = "";
+        o.textContent = "No projects yet";
+        sel.appendChild(o);
+        return;
+      }
+      db.projects.forEach(function (p) {
+        const o = document.createElement("option");
+        o.value = p.id;
+        o.textContent = p.name + " (" + p.publicId + ")";
+        sel.appendChild(o);
+      });
+      if (cur) sel.value = cur;
+    });
+  }
+
+  function refreshStats() {
+    const db = loadDB();
+    const scripts = db.projects.filter(function (p) { return p.scriptBody; }).length;
+    const active = db.licenses.filter(function (l) { return !l.revoked; }).length;
+    document.getElementById("stProjects").textContent = db.projects.length;
+    document.getElementById("stScripts").textContent = scripts;
+    document.getElementById("stKeys").textContent = db.licenses.length;
+    document.getElementById("stActive").textContent = active;
+    document.getElementById("homeProjects").textContent = db.projects.length;
+    document.getElementById("homeLicenses").textContent = db.licenses.length;
+  }
+
+  function refreshProjectsTable() {
+    const db = loadDB();
+    const tb = document.getElementById("projTable");
+    tb.innerHTML = "";
+    if (!db.projects.length) {
+      tb.innerHTML = "<tr><td colspan='5' class='empty'>No projects yet</td></tr>";
+      return;
+    }
+    db.projects.slice().reverse().forEach(function (p) {
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td><strong></strong></td>" +
+        "<td class='mono'></td>" +
+        "<td></td>" +
+        "<td></td>" +
+        "<td></td>";
+      tr.querySelector("strong").textContent = p.name;
+      tr.querySelector(".mono").textContent = p.publicId;
+      tr.children[2].innerHTML = p.scriptBody
+        ? "<span class='pill ok'>Uploaded</span>"
+        : "<span class='pill err'>Empty</span>";
+      tr.children[3].textContent = p.updated ? new Date(p.updated).toLocaleString() : "—";
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "btn btn-danger btn-sm";
+      del.textContent = "Delete";
+      del.onclick = function () {
+        const d = loadDB();
+        d.projects = d.projects.filter(function (x) { return x.id !== p.id; });
+        d.licenses = d.licenses.filter(function (x) { return x.projectId !== p.id; });
+        saveDB(d);
+        refreshAll();
+      };
+      tr.children[4].appendChild(del);
+      tb.appendChild(tr);
+    });
+  }
+
+  function refreshLicensesTable() {
+    const db = loadDB();
+    const tb = document.getElementById("licTable");
+    tb.innerHTML = "";
+    if (!db.licenses.length) {
+      tb.innerHTML = "<tr><td colspan='5' class='empty'>No licenses yet</td></tr>";
+      return;
+    }
+    db.licenses.slice().reverse().forEach(function (l) {
+      const proj = db.projects.find(function (p) { return p.id === l.projectId; });
+      const expired = l.expiresAt && Date.now() > l.expiresAt;
+      const status = l.revoked ? "Revoked" : expired ? "Expired" : "Active";
+      const pill = l.revoked || expired ? "err" : "ok";
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td class='mono'></td>" +
+        "<td></td>" +
+        "<td></td>" +
+        "<td><span class='pill " + pill + "'></span></td>" +
+        "<td></td>";
+      tr.querySelector(".mono").textContent = l.key;
+      tr.children[1].textContent = proj ? proj.name : "?";
+      tr.children[2].textContent = l.expiresAt ? new Date(l.expiresAt).toLocaleDateString() : "Lifetime";
+      tr.querySelector(".pill").textContent = status;
+      if (!l.revoked) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-danger btn-sm";
+        btn.textContent = "Revoke";
+        btn.onclick = function () {
+          const d = loadDB();
+          const x = d.licenses.find(function (k) { return k.id === l.id; });
+          if (x) x.revoked = true;
+          saveDB(d);
+          refreshAll();
+        };
+        tr.children[4].appendChild(btn);
+      }
+      tb.appendChild(tr);
+    });
+  }
+
+  function refreshLoader() {
+    const db = loadDB();
+    const pid = document.getElementById("loaderProject").value;
+    const p = db.projects.find(function (x) { return x.id === pid; });
+    const box = document.getElementById("loaderOut");
+    if (!p) {
+      box.textContent = "Select a project to generate a loader template.";
+      return;
+    }
+    box.textContent =
+      "-- Vasper Shield loader template (demo)\n" +
+      "-- Replace API with your real backend when ready\n" +
+      "local PROJECT = \"" + p.publicId + "\"\n" +
+      "local KEY = \"PASTE_LICENSE_KEY\"\n" +
+      "local API = \"https://YOUR_API/v1/deliver\"\n\n" +
+      "-- 1) POST { projectPublicId, key, hwid }\n" +
+      "-- 2) If ok, loadstring(response.script)()\n" +
+      "-- 3) On invalid_key / expired / revoked → stop\n\n" +
+      "-- Demo note: use \"Test deliver\" on this page to simulate the check.";
+  }
+
+  function refreshAll() {
+    fillProjectSelects();
+    refreshStats();
+    refreshProjectsTable();
+    refreshLicensesTable();
+    refreshLoader();
+  }
+
+  document.getElementById("createProj").onclick = function () {
+    const name = document.getElementById("projName").value.trim();
+    if (!name) return setMsg("projMsg", "Enter a project name.", false);
+    const db = loadDB();
+    db.projects.push({
+      id: uid("proj"),
+      publicId: "vp_" + Math.random().toString(36).slice(2, 10),
+      name: name,
+      scriptName: "",
+      scriptBody: "",
+      updated: Date.now()
+    });
+    saveDB(db);
+    document.getElementById("projName").value = "";
+    setMsg("projMsg", "Project created.", true);
+    refreshAll();
+  };
+
+  document.getElementById("saveScript").onclick = function () {
+    const pid = document.getElementById("scriptProject").value;
+    const sname = document.getElementById("scriptName").value.trim() || "main";
+    const body = document.getElementById("scriptBody").value;
+    if (!pid) return setMsg("scriptMsg", "Create a project first.", false);
+    if (!body.trim()) return setMsg("scriptMsg", "Paste Lua source.", false);
+    const db = loadDB();
+    const p = db.projects.find(function (x) { return x.id === pid; });
+    if (!p) return setMsg("scriptMsg", "Project not found.", false);
+    p.scriptName = sname;
+    p.scriptBody = body;
+    p.updated = Date.now();
+    saveDB(db);
+    setMsg("scriptMsg", "Script saved for \"" + p.name + "\".", true);
+    refreshAll();
+  };
+
+  document.getElementById("genKey").onclick = function () {
+    const pid = document.getElementById("licProject").value;
+    if (!pid) return setMsg("licMsg", "Select a project.", false);
+    var days = parseInt(document.getElementById("licDays").value, 10);
+    if (isNaN(days) || days < 0) days = 0;
+    const db = loadDB();
+    const key = genKey();
+    db.licenses.push({
+      id: uid("lic"),
+      projectId: pid,
+      key: key,
+      expiresAt: days > 0 ? Date.now() + days * 864e5 : null,
+      revoked: false,
+      createdAt: Date.now()
+    });
+    saveDB(db);
+    setMsg("licMsg", "Created key: " + key, true);
+    refreshAll();
+  };
+
+  document.getElementById("loaderProject").onchange = refreshLoader;
+
+  document.getElementById("copyLoader").onclick = async function () {
+    const text = document.getElementById("loaderOut").textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      setMsg("loaderMsg", "Loader template copied.", true);
+    } catch (e) {
+      setMsg("loaderMsg", "Copy manually from the box.", false);
+    }
+  };
+
+  document.getElementById("testDeliver").onclick = function () {
+    const db = loadDB();
+    const pid = document.getElementById("loaderProject").value;
+    const key = document.getElementById("loaderKey").value.trim();
+    const p = db.projects.find(function (x) { return x.id === pid; });
+    if (!p) return setMsg("loaderMsg", "Select a project.", false);
+    if (!key) return setMsg("loaderMsg", "Paste a license key.", false);
+    const lic = db.licenses.find(function (l) { return l.projectId === pid && l.key === key; });
+    if (!lic) return setMsg("loaderMsg", "invalid_key", false);
+    if (lic.revoked) return setMsg("loaderMsg", "revoked", false);
+    if (lic.expiresAt && Date.now() > lic.expiresAt) return setMsg("loaderMsg", "expired", false);
+    if (!p.scriptBody) return setMsg("loaderMsg", "no_script", false);
+    setMsg("loaderMsg", "ok · deliver would return " + p.scriptBody.length + " chars (demo)", true);
+    document.getElementById("loaderOut").textContent =
+      "-- Demo deliver OK\n" +
+      "-- version: current\n" +
+      "-- script preview (first 400 chars):\n\n" +
+      p.scriptBody.slice(0, 400) + (p.scriptBody.length > 400 ? "\n..." : "");
+  };
+
+  refreshAll();
+})();
+  </script>
+</body>
+</html>
